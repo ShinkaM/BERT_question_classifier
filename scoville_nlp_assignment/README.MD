@@ -6,7 +6,7 @@
 
 ## How to execute
 
-The fine tuned model  ` "./lora_bert_model_v2"` is provied along with the script
+The fine tuned model  ` "./lora_bert_model_v2"` is provided along with the script
 
 Execute the code with 
 
@@ -29,7 +29,9 @@ I chose my method based on my observations about the data, my computing resource
 
 Looking at the data, I noticed that the data is in Japanese and that the vocabulary is very diverse; the questions are not marked by a question mark, meaning that feature engineering would be difficult if using traditional methods such as SVM.  For tasks like this, methods that can create more representative features is more ideal, such as BERT models.
 
-Since I do not have access to a GPU but have an Apple M2, I chose to utilize the mps and use LORA since it is less computationally expensive than fine tuning from scratch.  I chose to use the pre-trained model `cl-tohoku/bert-base-japanese` since it has been demonstrated to do well on Japanese tasks.  
+Since I do not have access to a GPU but have an Apple M2, I chose to utilize the mps and use LORA since it is less computationally expensive than fine tuning from scratch.  I chose to use the pre-trained model `cl-tohoku/bert-base-japanese` since it has been demonstrated to do well on Japanese tasks -> give reason, papers or examples
+
+
 
 ### Data
 I split `training.csv` to use 80% for training and 20% for validation.  
@@ -40,7 +42,7 @@ Based on the validation set, the model achieves
 
 ![image-20250227150314144](/Users/ts-shinka.mori/Library/Application Support/typora-user-images/image-20250227150314144.png)
 
-For reference here are the sentences it misclassified.
+For reference here are the sentences it misclassified.  -:> why is this wrong
 
 |predicted|true|sentence|
 |----|---|----|
@@ -75,5 +77,17 @@ Another approach would be to use an RNN since the label set is small.
   - To match sentences that have dissimilar words but similar in meaning, vectorizing the sentence and finding sentences that has a low cosine similarity with the target sentence can retrieve the most semantically similar sentence.
   - To find which semantically distinct questions come up most frequently, I would vectorize the data using sentence embeddings, for example by using `SentencePiece` and use UMAP, a dimension reduction algorithm, to reduce the dimensions. Then I can use a clustering method such as HDBSCAN or K-means to cluster the sentences.  If they want to have more control over the topic clusters I recommend using HDBSCAN to create clusters that are farther away from each other. Then the centroids of the clusters would be the most representative sentence for the cluster that is also distinct from the others.
   - Using sentence embeddings and clustering would handle the issue of sentences having similar meanings but different words since sentence embeddings can capture the overall meaning of the sentence in a vectorized format.
+  - -> why cosine similarity is indicativeof this, give examples
+  - 
 - \-  Imagine your data is call transcripts from an e-commerce business. Their customers have various topics they may contact the business with, but among them would be statements about concerns on certain products, or issues with the website, etc. How would you go about extracting concerns raised?
-  - This question is similar to the task of intent classification. I would extract the concerns by vectorizing the call transcripts and using UMAP to perform dimension reduction; then I would use HDBSCAN to cluster the sentences.  The size and quality of the clusters can be adjusted by fine tuning the hyperparameters.  I would then either manually lable the clusters based on its contents or use GENAI to summarize them to facilitate the task.
+  -  I would extract the concerns by vectorizing the call transcripts and using UMAP to perform dimension reduction; then I would use HDBSCAN to cluster the sentences.  The size and quality of the clusters can be adjusted by fine tuning the hyperparameters.  I would then either manually lable the clusters based on its contents or use LLM to summarize them to facilitate the task.
+- Support idea
+- 
+
+
+
+
+
+
+
+why where what and how
