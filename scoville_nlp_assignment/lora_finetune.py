@@ -10,7 +10,7 @@ from datasets import Dataset
 
 """
 Load the dataset from pandas and convert boolean to int for easier computation
-"""
+
 def load_data(train_csv):
     df = pd.read_csv(train_csv)
     
@@ -24,8 +24,10 @@ def load_data(train_csv):
     return train_dataset, val_dataset
 
 """
-Preprocess data by tokenizing the sentences and relabeling the column.
-The tokenizer base for the model used "cl-tohoku/bert-base-japanese" is MeCab
+
+# Preprocess data by tokenizing the sentences and relabeling the column.
+# The tokenizer base for the model used "cl-tohoku/bert-base-japanese" is MeCab
+
 """
 
 def preprocess_data(dataset, tokenizer):
@@ -37,8 +39,9 @@ def preprocess_data(dataset, tokenizer):
     return dataset
 
 """
-Training code
-Execute the code below to train the model using LORA; 100iters/60sec on Mac M2
+# Training code
+# Execute the code below to train the model using LORA; 100iters/60sec on Mac M2
+
 """
 
 model_name = "cl-tohoku/bert-base-japanese"
@@ -68,7 +71,7 @@ training_args = TrainingArguments(
         learning_rate=2e-5,             # Learning rate
         per_device_train_batch_size=20, # Batch size for training
         per_device_eval_batch_size=20,  # Batch size for evaluation
-        num_train_epochs=2,             # Number of epochs
+        num_train_epochs=3,             # Number of epochs
         weight_decay=0.01,              # Weight decay
         logging_dir="./logs",           # Directory for logging
         logging_steps=10,               # Log every 10 steps
@@ -98,16 +101,17 @@ trainer.train()
 
 model.save_pretrained("./lora_bert_model_v2")
 
+"""
 
 """
 Load fine-tuned model
 
-
-MODEL_NAME = "./results/checkpoint-4886"
+"""
+MODEL_NAME = "./lora_bert_model_v2"
 model_name = "cl-tohoku/bert-base-japanese"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
 
 def predict_intent(text, model, tokenizer):
     inputs = tokenizer(
@@ -123,9 +127,10 @@ def predict_intent(text, model, tokenizer):
         predicted_class = torch.argmax(logits, dim=-1).item()
     return predicted_class
 
-# device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu") ##if mps is available
-device = torch.device("cuda:0" if torch.cuda.is_available()  else "cpu" )
- 
+device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu") ##if mps is available
+# device = torch.device("cuda:0" if torch.cuda.is_available()  else "cpu" )
+model.to(device)
+
 df = pd.read_csv('datasets/test.csv')
 
 results = []        
@@ -137,4 +142,3 @@ results = [True if i else False for i in results]
 df['is_question'] = results
 
 df.to_csv('output.csv', index=None)
-"""
